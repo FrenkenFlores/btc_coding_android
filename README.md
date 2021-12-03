@@ -1,2 +1,1 @@
-# android-task
-
+Задание участникам трэка Android
