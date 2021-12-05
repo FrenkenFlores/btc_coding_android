@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="url">https://iss.moex.com/iss/engines/stock/markets/bonds/boards/TQOB/securities.json</string>
+</resources>
