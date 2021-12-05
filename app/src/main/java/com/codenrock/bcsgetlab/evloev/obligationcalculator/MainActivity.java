@@ -200,9 +200,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (i == 5) break;
         }
 
+        Double earn = moneyValue *  topObligations.get(0).CouponYeild;
+
         // Create new intent
         Intent intent = new Intent(this, generatedPortfolio.class);
-        intent.putExtra("topObligations", (Serializable) topObligations);
+        intent.putExtra("topObligations", earn);
         startActivity(intent);
     }
 

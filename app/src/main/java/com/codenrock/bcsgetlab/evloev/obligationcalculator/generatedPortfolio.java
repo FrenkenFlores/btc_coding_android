@@ -19,9 +19,7 @@ public class generatedPortfolio extends AppCompatActivity {
 
         Intent i = getIntent();
         et = (EditText) findViewById(R.id.results);
-        List<MainActivity.Obligation> top = (List<MainActivity.Obligation>) i.getSerializableExtra("topObligations");
-        for (MainActivity.Obligation o: top) {
-            et.setText(o.SHORTNAME + " " + o.FACEVALUE + " " + o.YIELDATPREVWAPRICE + " " + o.CouponYeild);
-        }
+        Double t = (Double) i.getSerializableExtra("topObligations");
+        et.setText(Double.toString(t));
     }
 }
