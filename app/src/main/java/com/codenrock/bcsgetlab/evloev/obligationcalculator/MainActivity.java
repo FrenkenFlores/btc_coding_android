@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -28,6 +29,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private HttpURLConnection connection;
 
     private Button button_create_portfolio;
+    private EditText period;
+    private int periodValue;
+    private EditText money;
+    private int moneyValue;
 
     private final String TAG_C_P="button_create_portfolio";
     private final String TAG_URL="set_connection";
@@ -38,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         content = new StringBuffer();
+        period = (EditText) findViewById(R.id.inputPeriodText);
+        money = (EditText) findViewById(R.id.inputMoneyText);
         button_create_portfolio = (Button) findViewById(R.id.button_create_portfolio);
         button_create_portfolio.setOnClickListener(this);
     }
@@ -148,7 +155,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        periodValue = Integer.valueOf(period.getText().toString());
+        moneyValue = Integer.valueOf(money.getText().toString());
+
         Log.d(TAG_C_P, "Button");
         Log.d(TAG_URL, getResources().getString(R.string.url));
+        Log.d("Input period", period.getText().toString());
+        Log.d("Input money", money.getText().toString());
     }
 }

@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">ObligationCalculator</string>
     <string name="button_create_portfolio">Создать портфель</string>
+    <string name="periodText">Срок инвестиции</string>
+    <string name="moneyText">Сумма инвестиции</string>
+    <string name="inputPeriodText">Ввидте срок инвестиции</string>
+    <string name="inputMoneyText">Ввидте сумму инвестиции</string>
+
 </resources>
