@@ -9,6 +9,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -36,6 +40,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         content = new StringBuffer();
         button_create_portfolio = (Button) findViewById(R.id.button_create_portfolio);
         button_create_portfolio.setOnClickListener(this);
+    }
+
+    public static String parseJson(String responseBody) throws JSONException {
+        JSONObject allData = new JSONObject(responseBody);
+        JSONObject securities = allData.getJSONObject("securities");
+        JSONArray data = securities.getJSONArray("data");
+
+        try {
+            for (int i = 0; i < data.length(); i++) {
+                String SHORTNAME = data.getJSONArray(i).optString(2, null);
+                double YIELDATPREVWAPRICE = data.getJSONArray(i).optDouble(4, 0);
+                double COUPONVALUE = data.getJSONArray(i).optDouble(5, 0);
+                String NEXTCOUPON = data.getJSONArray(i).optString(6, null);
+                double ACCRUEDINT = data.getJSONArray(i).optDouble(7, 0);
+                double PREVPRICE = data.getJSONArray(i).optDouble(8, 0);
+                int LOTSIZE = data.getJSONArray(i).optInt(9, 0);
+                double FACEVALUE = data.getJSONArray(i).optDouble(10, 0);
+                String MATDATE = data.getJSONArray(i).optString(13, null);
+                int COUPONPERIOD = data.getJSONArray(i).optInt(15, 0);
+
+                Log.d(i + "----" + "SHORTNAME", SHORTNAME);
+                Log.d(i + "----" + "YIELDATPREVWAPRICE", String.valueOf(YIELDATPREVWAPRICE));
+                Log.d(i + "----" + "COUPONVALUE", String.valueOf(COUPONVALUE));
+                Log.d(i + "----" + "NEXTCOUPON", NEXTCOUPON);
+                Log.d(i + "----" + "ACCRUEDINT", String.valueOf(ACCRUEDINT));
+                Log.d(i + "----" + "PREVPRICE", String.valueOf(PREVPRICE));
+                Log.d(i + "----" + "LOTSIZE", String.valueOf(LOTSIZE));
+                Log.d(i + "----" + "FACEVALUE", String.valueOf(FACEVALUE));
+                Log.d(i + "----" + "MATDATE", MATDATE);
+                Log.d(i + "----" + "COUPONPERIOD", String.valueOf(COUPONPERIOD));
+            }
+        } catch (Exception e) {
+            // TODO: handle null data
+        }
+
+        return null;
     }
 
     class SetHttpConnection extends AsyncTask<Void, Void, String> {
@@ -67,11 +107,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 reader = new BufferedReader( new InputStreamReader(connection.getInputStream()));
                 while ((line = reader.readLine()) != null) {
                     content.append(line);
-                    Log.d("line", line);
                 }
                 reader.close();
-                
-                Log.d("content", content.toString());
 
                 // Return status to onPostExecute
                 return "connection succeeded";
@@ -83,6 +120,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.e(TAG_URL, e.getMessage());
                 e.printStackTrace();
                 return "openConnection: connection failed";
+            } finally {
+                connection.disconnect();
             }
         }
 
@@ -100,10 +139,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        SetHttpConnection setc = new SetHttpConnection();
-        setc.execute();
+        SetHttpConnection setConnection = new SetHttpConnection();
+        setConnection.execute();
+        try {
+            // TODO: set stable connection befor parsing json
+            if (!content.toString().isEmpty())
+                parseJson(content.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         Log.d(TAG_C_P, "Button");
         Log.d(TAG_URL, getResources().getString(R.string.url));
-
     }
 }
