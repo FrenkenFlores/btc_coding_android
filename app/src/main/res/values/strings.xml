@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ObligationCalculator</string>
+    <string name="button_create_portfolio">Создать портфель</string>
 </resources>
