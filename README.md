@@ -11,3 +11,4 @@
 - [Java.net for Android](http://developer.alexanderklimov.ru/android/java/net.php)
 - [AsyncTask](http://developer.alexanderklimov.ru/android/theory/asynctask.php)
 - [SeekBar](http://developer.alexanderklimov.ru/android/views/seekbar.php)
+- [value decode ISS MOEX](https://euvgub.github.io/quik_user_manual/ch8_12_1.html)

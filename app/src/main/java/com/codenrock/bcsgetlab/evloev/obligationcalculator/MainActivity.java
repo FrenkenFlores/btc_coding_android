@@ -20,6 +20,13 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private BufferedReader reader;
@@ -33,9 +40,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int periodValue;
     private EditText money;
     private int moneyValue;
+    private TreeMap<Double, Obligation> obligations;
 
     private final String TAG_C_P="button_create_portfolio";
     private final String TAG_URL="set_connection";
+
+
+    protected class Obligation {
+        String SHORTNAME;
+        Double YIELDATPREVWAPRICE;
+        Double FACEVALUE;
+        Double CouponYeild;
+
+        public Obligation(String _shortname, Double _YIELDATPREVWAPRICE, Double _FACEVALUE) {
+            SHORTNAME = _shortname;
+            YIELDATPREVWAPRICE = _YIELDATPREVWAPRICE;
+            FACEVALUE = _FACEVALUE;
+        }
+
+        public void setCouponYeild(Double couponYeild) {
+            CouponYeild = couponYeild;
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,13 +70,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         content = new StringBuffer();
+        obligations = new TreeMap<Double, Obligation>(Collections.reverseOrder());
+
         period = (EditText) findViewById(R.id.inputPeriodText);
         money = (EditText) findViewById(R.id.inputMoneyText);
         button_create_portfolio = (Button) findViewById(R.id.button_create_portfolio);
         button_create_portfolio.setOnClickListener(this);
+
+
+
+        SetHttpConnection setConnection = new SetHttpConnection();
+        setConnection.execute();
+
     }
 
-    public static String parseJson(String responseBody) throws JSONException {
+
+
+    public TreeMap<Double, Obligation> parseJson(String responseBody, int periodValue) throws JSONException {
         JSONObject allData = new JSONObject(responseBody);
         JSONObject securities = allData.getJSONObject("securities");
         JSONArray data = securities.getJSONArray("data");
@@ -66,23 +103,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 double FACEVALUE = data.getJSONArray(i).optDouble(10, 0);
                 String MATDATE = data.getJSONArray(i).optString(13, null);
                 int COUPONPERIOD = data.getJSONArray(i).optInt(15, 0);
+                if (YIELDATPREVWAPRICE == 0 || FACEVALUE == 0) continue;
+                Double CouponYeild = (YIELDATPREVWAPRICE * 365) / (periodValue * FACEVALUE);
+                obligations.put(CouponYeild, new Obligation(SHORTNAME, YIELDATPREVWAPRICE, FACEVALUE));
 
-                Log.d(i + "----" + "SHORTNAME", SHORTNAME);
-                Log.d(i + "----" + "YIELDATPREVWAPRICE", String.valueOf(YIELDATPREVWAPRICE));
-                Log.d(i + "----" + "COUPONVALUE", String.valueOf(COUPONVALUE));
-                Log.d(i + "----" + "NEXTCOUPON", NEXTCOUPON);
-                Log.d(i + "----" + "ACCRUEDINT", String.valueOf(ACCRUEDINT));
-                Log.d(i + "----" + "PREVPRICE", String.valueOf(PREVPRICE));
-                Log.d(i + "----" + "LOTSIZE", String.valueOf(LOTSIZE));
-                Log.d(i + "----" + "FACEVALUE", String.valueOf(FACEVALUE));
-                Log.d(i + "----" + "MATDATE", MATDATE);
-                Log.d(i + "----" + "COUPONPERIOD", String.valueOf(COUPONPERIOD));
+//                Log.d(i + "----" + "SHORTNAME", SHORTNAME);
+//                Log.d(i + "----" + "YIELDATPREVWAPRICE", String.valueOf(YIELDATPREVWAPRICE));
+//                Log.d(i + "----" + "COUPONVALUE", String.valueOf(COUPONVALUE));
+//                Log.d(i + "----" + "NEXTCOUPON", NEXTCOUPON);
+//                Log.d(i + "----" + "ACCRUEDINT", String.valueOf(ACCRUEDINT));
+//                Log.d(i + "----" + "PREVPRICE", String.valueOf(PREVPRICE));
+//                Log.d(i + "----" + "LOTSIZE", String.valueOf(LOTSIZE));
+//                Log.d(i + "----" + "FACEVALUE", String.valueOf(FACEVALUE));
+//                Log.d(i + "----" + "MATDATE", MATDATE);
+//                Log.d(i + "----" + "COUPONPERIOD", String.valueOf(COUPONPERIOD));
             }
         } catch (Exception e) {
             // TODO: handle null data
         }
 
-        return null;
+
+        return obligations;
     }
 
     class SetHttpConnection extends AsyncTask<Void, Void, String> {
@@ -144,19 +185,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    @Override
-    public void onClick(View v) {
-        SetHttpConnection setConnection = new SetHttpConnection();
-        setConnection.execute();
+    public void createProfile(int periodValue, int moneyValue){
         try {
             // TODO: set stable connection befor parsing json
             if (!content.toString().isEmpty())
-                parseJson(content.toString());
+                parseJson(content.toString(), periodValue);
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        for (Map.Entry<Double, Obligation> o : obligations.entrySet()) {
+            Log.d("CouponYeild", String.valueOf(o.getKey()));
+            Log.d("SHORTNAME", o.getValue().SHORTNAME);
+            Log.d("FACEVALUE", String.valueOf(o.getValue().FACEVALUE));
+            Log.d("YIELDATPREVWAPRICE", String.valueOf(o.getValue().YIELDATPREVWAPRICE));
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+
+
+        //Create profile
         periodValue = Integer.valueOf(period.getText().toString());
         moneyValue = Integer.valueOf(money.getText().toString());
+        if (periodValue == 0 || moneyValue == 0) return;
+        createProfile(periodValue, moneyValue);
 
         Log.d(TAG_C_P, "Button");
         Log.d(TAG_URL, getResources().getString(R.string.url));
