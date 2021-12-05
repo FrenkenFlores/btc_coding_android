@@ -7,16 +7,23 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private BufferedReader reader;
+    private StringBuffer content;
+
     private URL url;
     private HttpURLConnection connection;
+
     private Button button_create_portfolio;
+
     private final String TAG_C_P="button_create_portfolio";
     private final String TAG_URL="set_connection";
 
@@ -31,18 +38,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button_create_portfolio.setOnClickListener(this);
     }
 
-    class SetHttpConnection extends AsyncTask<String, Integer, String> {
+    class SetHttpConnection extends AsyncTask<Void, Void, String> {
         @Override
-        protected String doInBackground(String... strings) {
+        protected String doInBackground(Void... voids) {
             try {
                 url = new URL(getResources().getString(R.string.url));
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setConnectTimeout(3000);
                 connection.setReadTimeout(3000);
-                if (connection.getResponseCode() == 200) {
-                    return connection.getResponseCode() + ": connection failed";
+                connection.connect();
+                try {
+                    int code = connection.getResponseCode();
+                    Log.d(TAG_URL, String.valueOf(code));
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+//                if (connection.getResponseCode() == 200) {
+//                    return connection.getResponseCode() + ": connection failed";
+//                }
+                return "connection succeeded";
             } catch (MalformedURLException e) {
                 Log.e(TAG_URL, e.getMessage());
                 e.printStackTrace();
@@ -52,22 +67,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 e.printStackTrace();
                 return "openConnection: connection failed";
             }
-            return "connection succeeded";
         }
 
         @Override
-        protected void onProgressUpdate(Integer... values) {
+        protected void onProgressUpdate(Void... values) {
             super.onProgressUpdate(values);
         }
 
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
+            Toast.makeText(MainActivity.this, s, Toast.LENGTH_LONG).show();
         }
     }
+
     @Override
     public void onClick(View v) {
+        SetHttpConnection setc = new SetHttpConnection();
+        setc.execute();
         Log.d(TAG_C_P, "Button");
         Log.d(TAG_URL, getResources().getString(R.string.url));
+
     }
 }
