@@ -2,6 +2,7 @@ package com.codenrock.bcsgetlab.evloev.obligationcalculator;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -199,7 +200,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.d("FACEVALUE", String.valueOf(o.getValue().FACEVALUE));
             Log.d("YIELDATPREVWAPRICE", String.valueOf(o.getValue().YIELDATPREVWAPRICE));
         }
+
+        // Create new intent
+        Intent intent = new Intent(this, generatedPortfolio.class);
+        startActivity(intent);
     }
+
 
     @Override
     public void onClick(View v) {
