@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -42,12 +43,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private EditText money;
     private int moneyValue;
     private TreeMap<Double, Obligation> obligations;
+    private List<Obligation> topObligations;
+
 
     private final String TAG_C_P="button_create_portfolio";
     private final String TAG_URL="set_connection";
 
 
-    protected class Obligation {
+    protected class Obligation implements Serializable {
         String SHORTNAME;
         Double YIELDATPREVWAPRICE;
         Double FACEVALUE;
@@ -72,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         content = new StringBuffer();
         obligations = new TreeMap<Double, Obligation>(Collections.reverseOrder());
+        topObligations = new ArrayList<Obligation>();
 
         period = (EditText) findViewById(R.id.inputPeriodText);
         money = (EditText) findViewById(R.id.inputMoneyText);
@@ -108,16 +112,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Double CouponYeild = (YIELDATPREVWAPRICE * 365) / (periodValue * FACEVALUE);
                 obligations.put(CouponYeild, new Obligation(SHORTNAME, YIELDATPREVWAPRICE, FACEVALUE));
 
-//                Log.d(i + "----" + "SHORTNAME", SHORTNAME);
-//                Log.d(i + "----" + "YIELDATPREVWAPRICE", String.valueOf(YIELDATPREVWAPRICE));
-//                Log.d(i + "----" + "COUPONVALUE", String.valueOf(COUPONVALUE));
-//                Log.d(i + "----" + "NEXTCOUPON", NEXTCOUPON);
-//                Log.d(i + "----" + "ACCRUEDINT", String.valueOf(ACCRUEDINT));
-//                Log.d(i + "----" + "PREVPRICE", String.valueOf(PREVPRICE));
-//                Log.d(i + "----" + "LOTSIZE", String.valueOf(LOTSIZE));
-//                Log.d(i + "----" + "FACEVALUE", String.valueOf(FACEVALUE));
-//                Log.d(i + "----" + "MATDATE", MATDATE);
-//                Log.d(i + "----" + "COUPONPERIOD", String.valueOf(COUPONPERIOD));
             }
         } catch (Exception e) {
             // TODO: handle null data
@@ -194,15 +188,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        int i = 1;
         for (Map.Entry<Double, Obligation> o : obligations.entrySet()) {
-            Log.d("CouponYeild", String.valueOf(o.getKey()));
-            Log.d("SHORTNAME", o.getValue().SHORTNAME);
-            Log.d("FACEVALUE", String.valueOf(o.getValue().FACEVALUE));
-            Log.d("YIELDATPREVWAPRICE", String.valueOf(o.getValue().YIELDATPREVWAPRICE));
+//            Log.d("CouponYeild", String.valueOf(o.getKey()));
+//            Log.d("SHORTNAME", o.getValue().SHORTNAME);
+//            Log.d("FACEVALUE", String.valueOf(o.getValue().FACEVALUE));
+//            Log.d("YIELDATPREVWAPRICE", String.valueOf(o.getValue().YIELDATPREVWAPRICE));
+
+            i++;
+            topObligations.add(o.getValue());
+            if (i == 5) break;
         }
 
         // Create new intent
         Intent intent = new Intent(this, generatedPortfolio.class);
+        intent.putExtra("topObligations", (Serializable) topObligations);
         startActivity(intent);
     }
 
