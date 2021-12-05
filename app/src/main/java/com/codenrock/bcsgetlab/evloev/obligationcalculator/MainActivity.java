@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -32,8 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
+        content = new StringBuffer();
         button_create_portfolio = (Button) findViewById(R.id.button_create_portfolio);
         button_create_portfolio.setOnClickListener(this);
     }
@@ -42,21 +42,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected String doInBackground(Void... voids) {
             try {
+                // Set connection
                 url = new URL(getResources().getString(R.string.url));
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
-                connection.setConnectTimeout(3000);
-                connection.setReadTimeout(3000);
-                connection.connect();
+                connection.setConnectTimeout(5000);
+                connection.setReadTimeout(5000);
+
+                // Log processes
                 try {
                     int code = connection.getResponseCode();
                     Log.d(TAG_URL, String.valueOf(code));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-//                if (connection.getResponseCode() == 200) {
+
+                // Check if got errors
+//                if (connection.getResponseCode() > 200) {
 //                    return connection.getResponseCode() + ": connection failed";
 //                }
+
+                // Read content and close connection
+                String line;
+                reader = new BufferedReader( new InputStreamReader(connection.getInputStream()));
+                while ((line = reader.readLine()) != null) {
+                    content.append(line);
+                    Log.d("line", line);
+                }
+                reader.close();
+                
+                Log.d("content", content.toString());
+
+                // Return status to onPostExecute
                 return "connection succeeded";
             } catch (MalformedURLException e) {
                 Log.e(TAG_URL, e.getMessage());
