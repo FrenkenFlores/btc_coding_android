@@ -190,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         int i = 1;
         for (Map.Entry<Double, Obligation> o : obligations.entrySet()) {
+            o.getValue().CouponYeild = o.getKey();
 //            Log.d("CouponYeild", String.valueOf(o.getKey()));
 //            Log.d("SHORTNAME", o.getValue().SHORTNAME);
 //            Log.d("FACEVALUE", String.valueOf(o.getValue().FACEVALUE));
@@ -200,11 +201,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (i == 5) break;
         }
 
-        Double earn = moneyValue *  topObligations.get(0).CouponYeild;
+        Double earn = (Double) (moneyValue *  topObligations.get(0).CouponYeild);
 
         // Create new intent
         Intent intent = new Intent(this, generatedPortfolio.class);
-        intent.putExtra("topObligations", earn);
+        intent.putExtra("res", Double.toString(earn));
         startActivity(intent);
     }
 

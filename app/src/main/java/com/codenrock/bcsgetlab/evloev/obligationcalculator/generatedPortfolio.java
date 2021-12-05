@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.EditText;
 
 import java.util.ArrayList;
@@ -19,7 +20,8 @@ public class generatedPortfolio extends AppCompatActivity {
 
         Intent i = getIntent();
         et = (EditText) findViewById(R.id.results);
-        Double t = (Double) i.getSerializableExtra("topObligations");
-        et.setText(Double.toString(t));
+        String t = i.getStringExtra("res");
+        Log.d("res", String.valueOf(t));
+        et.setText(t);
     }
 }
